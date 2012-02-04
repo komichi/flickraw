@@ -24,6 +24,34 @@ module FlickRaw
   URL_PHOTOSTREAM='http://www.flickr.com/photos/'.freeze
   URL_SHORT='http://flic.kr/p/'.freeze
 
+  # Include the following "undocumented" methods for collections manipulation?
+  USE_FLICKR_COLLECTIONS_API = true
+
+  # From: http://www.flickr.com/groups/api/discuss/72157600055461667/
+  #   flickr.collections.getTree         Optional user_id
+  #   flickr.collections.create          Optional description,    Optional parent_id,     Required title, Optional after_new_coll
+  #   flickr.collections.sortCollections Optional child_coll_ids, Optional coll_id,       Optional no_move
+  #   flickr.collections.editSets        Required collection_id,  Optional do_remove,     Required photoset_ids
+  #   flickr.collections.getInfo         Required collection_id
+  #   flickr.collections.createIcon      Required collection_id,  Required photo_ids
+  #   flickr.collections.removeSet       Required collection_id,  Required photoset_id
+  #   flickr.collections.delete          Required collection_id,  Optional recursive
+  #   flickr.collections.moveCollection  Required collection_id,  Required parent_coll_id 
+  #   flickr.collections.editMeta        Optional collection_id,  Optional description,   Optional title
+
+  FLICKR_COLLECTIONS_METHODS = %w{
+    flickr.collections.getTree
+    flickr.collections.create
+    flickr.collections.sortCollections
+    flickr.collections.editSets
+    flickr.collections.getInfo
+    flickr.collections.createIcon
+    flickr.collections.removeSet
+    flickr.collections.delete
+    flickr.collections.moveCollection
+    flickr.collections.editMeta
+  }
+
   # Root class of the flickr api hierarchy.
   class Flickr < Request
     # Authenticated access token
@@ -41,7 +69,10 @@ module FlickRaw
       @oauth_consumer.user_agent = USER_AGENT
       @access_token = @access_secret = nil
       
-      Flickr.build(call('flickr.reflection.getMethods')) if Flickr.flickr_objects.empty?
+      if Flickr.flickr_objects.empty?
+        Flickr.build(call('flickr.reflection.getMethods'))
+        Flickr.build(FLICKR_COLLECTIONS_METHODS) if USE_FLICKR_COLLECTIONS_API
+      end
       super self
     end
     
