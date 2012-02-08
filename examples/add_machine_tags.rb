@@ -6,8 +6,8 @@
 # machine tags and then adds such tags for those photos
 
 require 'rubygems'
-require './flickraw'
-require './flickraw/env'
+require 'flickraw'
+require 'flickraw/env'
 require 'digest/sha1'
 require 'digest/md5'
 require 'fileutils'
